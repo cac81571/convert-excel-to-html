@@ -1,0 +1,6 @@
+target/
+*.class
+*.xlsx
+*.xls
+*.html
+!.gitignore
