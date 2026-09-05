@@ -16,6 +16,12 @@ Apache POI を使い、Excel（`.xlsx` / `.xls`）を HTML と TXT（タブ区�
 mvn -q package
 ```
 
+実行可能 JAR（依存込み）が `target/convert-excel-to-html.jar` にできます。
+
+```bash
+java -jar target/convert-excel-to-html.jar 入力フォルダ
+```
+
 ## 使い方
 
 ### 単一ファイル
@@ -72,7 +78,9 @@ convert-excel-to-html.bat "入力フォルダ"
 convert-excel-to-html.bat "入力フォルダ" "出力フォルダ"
 ```
 
-初回は必要に応じて `mvn package` とクラスパス生成を行います。Java 17 以上が PATH に必要です。
+初回は必要に応じて `mvn package` で `target\convert-excel-to-html.jar` を作成します（bat が無い場合は自動ビルド）。  
+起動は `java -jar` です。Java 17 以上が PATH に必要です。
+
 ### サンプル Excel の作成
 
 動作確認用の `sample.xlsx` を生成します。

@@ -23,6 +23,7 @@ if "%~1"=="" (
 
 set "INPUT=%~1"
 set "OUTPUT=%~2"
+set "JAR=target\convert-excel-to-html.jar"
 
 if not exist "%INPUT%\" (
     echo エラー: フォルダではありません: %INPUT%
@@ -38,48 +39,34 @@ if errorlevel 1 (
     exit /b 1
 )
 
-if not exist "target\classes\com\example\excelhtml\ExcelToHtmlApp.class" (
+if not exist "%JAR%" (
     where mvn >nul 2>&1
     if errorlevel 1 (
-        echo エラー: ビルド成果物がありません。Maven で package するか、mvn を PATH に追加してください。
+        echo エラー: %JAR% がありません。先に mvn package を実行するか、mvn を PATH に追加してください。
         pause
         exit /b 1
     )
-    echo ビルド中...
+    echo ビルド中... ^(mvn package^)
     call mvn -q -DskipTests package
     if errorlevel 1 (
         echo エラー: ビルドに失敗しました。
         pause
         exit /b 1
     )
-)
-
-if not exist "cp.txt" (
-    where mvn >nul 2>&1
-    if errorlevel 1 (
-        echo エラー: cp.txt がありません。mvn dependency:build-classpath を実行してください。
-        pause
-        exit /b 1
-    )
-    echo クラスパスを生成中...
-    call mvn -q dependency:build-classpath -Dmdep.outputFile=cp.txt
-    if errorlevel 1 (
-        echo エラー: クラスパスの生成に失敗しました。
+    if not exist "%JAR%" (
+        echo エラー: ビルド後も %JAR% が見つかりません。
         pause
         exit /b 1
     )
 )
-
-set "CP="
-for /f "usebackq delims=" %%I in ("cp.txt") do set "CP=%%I"
 
 echo 入力: %INPUT%
 if defined OUTPUT (
     echo 出力: %OUTPUT%
-    java -cp "target\classes;%CP%" com.example.excelhtml.ExcelToHtmlApp "%INPUT%" "%OUTPUT%"
+    java -jar "%JAR%" "%INPUT%" "%OUTPUT%"
 ) else (
     echo 出力: ^(未指定 → フォルダ名_excelhtml^)
-    java -cp "target\classes;%CP%" com.example.excelhtml.ExcelToHtmlApp "%INPUT%"
+    java -jar "%JAR%" "%INPUT%"
 )
 
 set "EXITCODE=%ERRORLEVEL%"

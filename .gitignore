@@ -4,3 +4,4 @@ target/
 *.xls
 *.html
 !.gitignore
+*.txt
