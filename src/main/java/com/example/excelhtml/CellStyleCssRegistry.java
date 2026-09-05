@@ -72,7 +72,7 @@ final class CellStyleCssRegistry {
 
     private String buildCss(CellStyle style) {
         StringBuilder css = new StringBuilder();
-        appendFont(css, workbook.getFontAt(style.getFontIndexAsInt()), true);
+        appendFont(css, workbook.getFontAt(style.getFontIndex()), true);
         appendFill(css, style);
         appendAlignment(css, style);
         appendBorders(css, style);

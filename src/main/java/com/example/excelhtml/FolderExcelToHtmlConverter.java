@@ -247,15 +247,15 @@ public final class FolderExcelToHtmlConverter {
                     out.append("          <div class=\"source-links\" data-excel-path=\"")
                             .append(escape(file.excelPath())).append("\">\n");
                     out.append("            <button type=\"button\" data-copy-excel-path title=\"")
-                            .append(escape(file.excelPath())).append("\">コピー</button>\n");
+                            .append(escape(file.excelPath())).append("\">パスをコピー</button>\n");
                     if (file.downloadHref() != null && !file.downloadHref().isBlank()) {
                         String dlName = file.downloadFileName() != null ? file.downloadFileName() : file.excelName();
                         out.append("            <a href=\"").append(escape(file.downloadHref()))
                                 .append("\" download=\"").append(escape(dlName))
-                                .append("\" title=\"元の Excel をダウンロード\">DL</a>\n");
+                                .append("\" title=\"元の Excel をダウンロード\">ダウンロード</a>\n");
                     }
                     out.append("            <a href=\"").append(escape(openEditUri))
-                            .append("\" title=\"元ファイルを Excel で開く\">Excel</a>\n");
+                            .append("\" title=\"元ファイルを Excel で開く\">Excelで開く</a>\n");
                     out.append("          </div>\n");
                     out.append("        </td>\n");
                     out.append("      </tr>\n");
