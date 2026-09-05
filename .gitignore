@@ -5,3 +5,4 @@ target/
 *.html
 !.gitignore
 *.txt
+!samples/*.xlsx
