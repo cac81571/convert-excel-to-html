@@ -6,7 +6,7 @@ import java.nio.file.Path;
 /**
  * 使い方:
  * <pre>
- *   # 単一ファイル
+ *   # 単一ファイル（HTML と TXT を同時出力）
  *   mvn -q exec:java "-Dexec.args=入力.xlsx 出力.html"
  *
  *   # フォルダ一括（出力先省略時は &lt;親&gt;/&lt;フォルダ名&gt;_excelhtml）
@@ -39,8 +39,17 @@ public final class ExcelToHtmlApp {
         }
 
         Path output = Path.of(args[1]).toAbsolutePath().normalize();
+        Path outputParent = output.getParent();
+        if (outputParent != null) {
+            Files.createDirectories(outputParent);
+        }
         new ExcelToHtmlConverter().convert(input, output);
         System.out.println("Wrote: " + output);
+
+        Path txtPath = ExcelToTxtConverter.toTxtPath(output);
+        new ExcelToTxtConverter(true, ExcelToTxtConverter.DEFAULT_MAX_COL,
+                ExcelToTxtConverter.defaultMaxColBySheet()).convert(input, txtPath);
+        System.out.println("Wrote: " + txtPath);
     }
 
     /** 例: C:/data/samples → C:/data/samples_excelhtml */
@@ -56,7 +65,9 @@ public final class ExcelToHtmlApp {
     private static void printUsage() {
         System.err.println("Usage:");
         System.err.println("  ExcelToHtmlApp <input.xlsx|.xls> <output.html>");
+        System.err.println("    (also writes <output>.txt beside the HTML)");
         System.err.println("  ExcelToHtmlApp <input-folder> [output-folder]");
-        System.err.println("    (default output-folder: <parent>/<folder-name>_excelhtml, also writes index.html)");
+        System.err.println("    (default output-folder: <parent>/<folder-name>_excelhtml,");
+        System.err.println("     writes *.html, *.txt, and index.html)");
     }
 }

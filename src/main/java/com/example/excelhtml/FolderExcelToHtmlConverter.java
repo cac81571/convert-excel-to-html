@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Locale;
 
 /**
- * フォルダ内の Excel を一括変換し、インデックス HTML を生成する。
+ * フォルダ内の Excel を一括変換し、HTML / TXT とインデックス HTML を生成する。
  */
 public final class FolderExcelToHtmlConverter {
 
@@ -23,10 +23,12 @@ public final class FolderExcelToHtmlConverter {
             DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm").withZone(ZoneId.systemDefault());
 
     private final ExcelToHtmlConverter converter = new ExcelToHtmlConverter();
+    private final ExcelToTxtConverter txtConverter = new ExcelToTxtConverter(
+            true, ExcelToTxtConverter.DEFAULT_MAX_COL, ExcelToTxtConverter.defaultMaxColBySheet());
 
     /**
      * @param inputDir  Excel が入っているフォルダ
-     * @param outputDir HTML の出力先（存在しなければ作成）
+     * @param outputDir HTML / TXT の出力先（存在しなければ作成）
      * @return 生成した index.html のパス
      */
     public Path convertAll(Path inputDir, Path outputDir) throws IOException {
@@ -54,6 +56,10 @@ public final class FolderExcelToHtmlConverter {
                     modified,
                     result.sheetNames()));
             System.out.println("Wrote: " + htmlPath.toAbsolutePath());
+
+            Path txtPath = ExcelToTxtConverter.toTxtPath(htmlPath);
+            txtConverter.convert(excel, txtPath);
+            System.out.println("Wrote: " + txtPath.toAbsolutePath());
         }
 
         Path indexPath = outputDir.resolve("index.html");

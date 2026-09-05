@@ -1,8 +1,9 @@
 # convert-excel-to-html
 
-Apache POI を使い、Excel（`.xlsx` / `.xls`）を HTML に変換する Maven プロジェクトです。
+Apache POI を使い、Excel（`.xlsx` / `.xls`）を HTML と TXT（タブ区切り）に変換する Maven プロジェクトです。
 
 セルの表示値に加え、列幅・結合・スタイル（フォント / 色 / 配置 / 枠線）を Excel 風グリッドとして出力します。
+あわせて groovy-excel2csv 相当の TXT（シート名・行番号付き TSV）も出力します。
 
 ## 必要環境
 
@@ -23,15 +24,18 @@ mvn -q package
 mvn -q exec:java "-Dexec.args=入力.xlsx 出力.html"
 ```
 
+`出力.html` と同時に、同名の `出力.txt`（タブ区切り）も生成されます。
+
 例:
 
 ```bash
 mvn -q exec:java "-Dexec.args=sample.xlsx output.html"
+# → output.html と output.txt
 ```
 
 ### フォルダ一括変換
 
-フォルダ内の `.xlsx` / `.xls` をすべて変換し、`index.html` を生成します。  
+フォルダ内の `.xlsx` / `.xls` をすべて変換し、各ファイルの HTML・TXT と `index.html` を生成します。  
 インデックスにはシート名リンクがあり、`ファイル.html#sheet-0` のように直接そのシートを開けます。  
 各 HTML / インデックスから、元の Excel のフルパスをコピーしたり、ダウンロードしたり、Excel で開けます。  
 「ダウンロード」は元ファイルへの相対リンク（`download` 属性）です。  
@@ -50,7 +54,7 @@ mvn -q exec:java "-Dexec.args=入力フォルダ 出力フォルダ"
 
 ```bash
 mvn -q exec:java "-Dexec.args=samples"
-# → ../samples_excelhtml/*.html と index.html（入力が samples の場合）
+# → ../samples_excelhtml/*.html / *.txt と index.html（入力が samples の場合）
 ```
 
 ### ドラッグ＆ドロップ（bat）
@@ -78,6 +82,8 @@ mvn -q exec:java "-Dexec.mainClass=com.example.excelhtml.CreateSampleExcel" "-De
 ```
 
 ## 変換の挙動
+
+### HTML
 
 | セル種別 | 出力 |
 |----------|------|
@@ -107,14 +113,32 @@ HTML 特殊文字（`&`, `<`, `>`, `"`）はエスケープされます。
   - 列見出し（A,B,C…）クリックで列全選択、行見出し（1,2,3…）クリックで行全選択、左上角クリックで全選択
   - `Ctrl+C`（Mac は `Cmd+C`）でコピー（複数セルは TSV）
 
+### TXT（groovy-excel2csv 相当）
+
+HTML と同じベース名で `.txt` を出力します（UTF-8、改行は CRLF、区切りはタブ）。
+
+| 項目 | 内容 |
+|------|------|
+| 行形式 | `[シート名]` + `R00001`（行番号）+ セル値… |
+| 図形 | `[シート名]` + `A00001`（アンカー行）+ テキスト |
+| 非表示シート | スキップ |
+| 空行 | スキップ |
+| セル内改行 | 除去 |
+| 取消線 | 該当文字を除去 |
+| 日付 | `yyyy/MM/dd` |
+| 最大列 | 既定 100（シート名「リクエスト」は 37、「レスポンス」は 35） |
+
 ## プロジェクト構成
 
 ```
 src/main/java/com/example/excelhtml/
 ├── ExcelToHtmlApp.java              # CLI 入口（単一 / フォルダ）
 ├── ExcelToHtmlConverter.java        # Workbook → HTML
+├── ExcelToTxtConverter.java         # Workbook → TXT（TSV）
 ├── FolderExcelToHtmlConverter.java  # フォルダ一括 + index.html
-├── CellValueFormatter.java          # セル表示値の取得
+├── CellValueFormatter.java          # HTML 用セル表示値
+├── TxtCellValueFormatter.java       # TXT 用セル値（取消線除去など）
+├── ExcelShapeTextExtractor.java     # オートシェイプテキスト抽出
 ├── CellStyleCssRegistry.java        # CellStyle → CSS
 └── CreateSampleExcel.java           # サンプル xlsx 生成
 ```
